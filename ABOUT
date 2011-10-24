@@ -8,7 +8,5 @@ Main features implemented in the framework:
     Structured XML file with object declarations is easy to fill and maintain.
     You don't have to set fixed time intervals to wait until some AJAX control appears on the page, the framework has a reliable mechanism to handle such situations. 
 
-Details of the framework usage in HOWTO file. 
-
 mailto: anahorny@gmail.com
 
