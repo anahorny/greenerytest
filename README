@@ -1,0 +1,159 @@
+ |_   _        _)_  _  o 
+ ) ) (_) )_)_)  (_ (_) o 
+
+How to use the "Dimanche" test automation framework.
+
+Important: This test automation framework is based on Watir Webdriver and Cucumber. You should be familiar with these tools and also Ruby programming language to start working with the framework.
+
+TEST EXECUTION
+==============
+	Install these gems:
+	gem install rspec
+	gem install rake
+	gem install cucumber
+	gem install watir-webdriver
+	gem install win32console (if you want color test results output in Windows OS terminal)
+	gem install syntax (for code syntax highlighting in reports)
+
+	For integration with Continuous Integration Servers like Hudson or TeamCity, JUnit-format XML reports are automatically generated in reports subdirectory during execution of default Rake target (cucumber.yml). Or if you don't like Rake for some reasons you can use Apache Ant with the preconfigured build.xml file supplied.
+
+	start_ff.sh, start_ff.bat, and start_ff.bat scripts are used to automate most of the tasks above running the test suite on the given platform.
+
+GHERKIN PHRASE PATTERNS (examples)
+=================================
+	Given I am on the "some_page"
+	Then I should see "Some text" text in "Some place" of "Some page"
+	When I set "Some text" in "Some field" of "Some page"
+	When I click "Some button" on "Some page"
+	When I click "Some link" on "Some page"
+	Then I should see the following values in "Some place" of "Some page"
+		|Some text|
+		|Another text|
+	When I set the following objects on "Some page"
+		|Some checkbox|
+		|Another checkbox|
+
+ENVIRONMENT PROPERTIES
+======================
+	 $props.get_env is the method that extracts the environment properties from properties.xml file
+
+	 USAGE:
+	 ------------------------Watir code---------------------------------
+	 $browser.goto $props.get_env("site_url")
+	 ------------------------Watir code---------------------------------
+	 ------------------------properties.xml-----------------------------
+	 <root>
+	 <host name="common">   
+		<site_url>http://localhost:3000</site_url>
+	 </host>
+	 </root>
+	 ------------------------properties.xml-----------------------------
+
+	 properties.xml file can have several set of properties - per each host where test suite is running.
+	 The method automatically identifies the hostname and uses the respective section.
+	 If it cannot find the respective section, it uses the "common" section.
+	 The property <latency> defines the pause (in seconds) after each Cucumber step execution, e.g. <latency>5</latency>.
+
+OBJECT MAPPING
+==============
+	 $props.make is the method that performs given Watir actions with the given object on the given page extracting the object attributes from mappings.xml file.
+
+	 USAGE:
+	 ------------------------Watir code---------------------------------
+	 $props.make('action'=>'set', 'value'=>'pass', 'object'=>'Username field', 'page'=>'Front')
+	 This will be converted in runtime to the following code:
+	 	$browser.text_field(:xpath,"//input[@name='userID']").set("pass")
+	 ------------------------Watir code---------------------------------
+	 ------------------------mappings.xml-------------------------------
+	 <root>
+	 <page name="Front">
+		<obj name="Username field" type="text_field" attr=":xpath" value="//input[@name='userID']"/>
+	 </page>
+	 </root>
+	 ------------------------mappings.xml-------------------------------
+	 If we need just to return the object not performing any method, then we should omit 'action' and 'value' parameters. For example we may need this to access the table.
+	 ------------------------Watir code---------------------------------	 
+	 $props.make('object'=>'Some table', 'page'=>'Front')[1][3].click
+	 This will be converted in runtime to the following code:
+	 	$browser.table(:xpath,"//input[@name='userID']")[1][3].click
+	 ------------------------Watir code---------------------------------
+	 ------------------------mappings.xml-------------------------------
+	 <root>
+	 <page name="Front">
+		<obj name="Some table" type="table" attr=":xpath" value="//table[@id='FBAVLogOut']"/>
+	 </page>
+	 </root>
+	 ------------------------mappings.xml-------------------------------
+
+	 If we have several attributes + object parent elements
+	 ------------------------Watir code---------------------------------
+	 $props.make('action'=>'click', 'object'=>'Username field', 'page'=>'Front')
+	 This will be converted in runtime to the following code:
+	 	$browser.frame(:name,"f_7").table(:value,"my").text_field(:xpath,"//input[@name='userID']").click
+	 ------------------------Watir code---------------------------------
+	 ------------------------mappings.xml-------------------------------
+	 <root>
+	 <page name="Front">
+		<obj name="Username field" type="text_field" attr=":xpath" value="//input[@name='userID']">
+			<parent type="frame" attr=":name" value="f_7"/>
+			<parent type="table" attr=":value" value="my"/>
+		</obj>
+	 </page>
+	 </root>
+	 ------------------------mappings.xml------------------------------- 
+
+	 If we have several attributes + object parent elements + variable substrings
+	 ------------------------Watir code---------------------------------
+	 $props.make({'action'=>'click', 'object'=>'Username field', 'page'=>'Front'}, 25, 50)
+	 This will be converted in runtime to the following code:
+	 	$browser.frame(:name,"f_7").table(:value,"my").text_field(:xpath,"//input[@name='25userID50']").click
+	 ------------------------Watir code---------------------------------
+	 ------------------------mappings.xml-------------------------------
+	 <root>
+	 <page name="Front">
+		<obj name="Username field" type="text_field" attr=":xpath" value="//input[@name='$var$userID$var$']">
+			<parent type="frame" attr=":name" value="f_7"/>
+			<parent type="table" attr=":value" value="my"/>
+		</obj>
+	 </page>
+	 </root>
+	 ------------------------mappings.xml------------------------------- 
+
+TIPS & TRICKS
+=============
+	1. 'type', 'attr' and 'value' attributes of the object definition in mappings.xml file should be the real: HTML type, Watir action and DOM attribute value.
+	2. In the following GHERKIN phrase example:
+	When I set "Some text" in "Some field" of "Some page"
+	'set' is the actual Watir action that will be performed with the object, "Some text" is the value that will be set in the object, "Some field" is <obj name> tag in the definition of the object, "Some page" is the <page name> tag in the definition of the object.
+	3. You can see the predefined step definitions in steps.rb file, you may add new step definitions or customize the existing if needed.
+
+KNOWN PROBLEMS
+==============
+	1. During test execution on Windows platform you may get the next exception:
+	Exception 'WIN32OLERuntimeError' at <filename.rb>:<line#> - unknown OLE server: 'AutoItX3.Control'
+	That happens, because in some cases, after you install Watir, the .dll file fails to get registered. 
+	If this is your problem, then all you need to do is type the following where your AutoItX3.dll file is installed 
+	(if you are using Watir's version of AutoIt then on Windows for 1.6.2 it should be at: C:\Ruby\lib\ruby\gems\1.8\gems\watir-1.6.2\lib\watir\)
+	regsvr32 AutoItX3.dll
+
+	2. If there are several frames on the page then there could be problems accessing them with Watir.
+
+	When we try to print a list of frames on the page:
+		ie.show_frames
+
+	the following errors are displayed:
+		there are 2 frames
+		frame  index: 1 Access Denied, see http://wiki.openqa.org/display/WTR/FAQ#access-denied
+		frame  index: 2 Access Denied, see http://wiki.openqa.org/display/WTR/FAQ#access-denied
+
+	Here you can find the possible workaround for this problem: http://wiki.openqa.org/display/WTR/Frames
+
+	Add the particular host to the Internet Explorer Trusted Sites list.  From IE's menu bar, choose Tools / Internet Options; click on the Security tab; click on the Trusted Sites icon; click on the Sites... button; type the name of the site into the field labelled "Add this Web site to the zone:".  You may need to uncheck the box labelled "Require server verification ( https: ) for all sites in this zone."  Click OK to finish the process.
+
+	3. If you have problems with passing through proxy server while installing gems, then you should use the following syntax:
+	gem install [gem_name] -p http://[username]:[password]@[proxy_name]:[proxy_port]
+
+	4. You get "uninitialized constant Windows::API::Error (NameError) ...". To solve this problem you should install the latest version of windows-pr gem (1.0.3 works fine): gem install windows-pr 
+
+	5. If you are using Ruby on Rails, then it is recommended to start Ruby on Rails UI in production mode (starting it in development mode causes certain problems for Watir).
+
