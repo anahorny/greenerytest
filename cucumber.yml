@@ -1,0 +1,2 @@
+default: --format html --out ./out/html/report.html --format junit --out ./out/junit --format pretty
+

@@ -1,0 +1,14 @@
+Dimanche is open source and freeware test automation framework built upon Watir Webdriver and Cucumber.
+
+The main goal of the framework is to speed-up scripts creation and decrease time for maintenance.
+
+Main features implemented in the framework:
+
+    In most cases you don't need to write Ruby code, only plain-text Cucumber scenarios, the framework will generate the code auto-magically if you follow the patterns.
+    Structured XML file with object declarations is easy to fill and maintain.
+    You don't have to set fixed time intervals to wait until some AJAX control appears on the page, the framework has a reliable mechanism to handle such situations. 
+
+Details of the framework usage in HOWTO file. 
+
+mailto: anahorny@gmail.com
+

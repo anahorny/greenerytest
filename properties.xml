@@ -1,0 +1,8 @@
+<!-- Parameters -->
+<root>
+<host name="common">   
+   <home_page>http://www.google.co.uk/</home_page>
+   <latency>5</latency>
+</host>
+</root>
+

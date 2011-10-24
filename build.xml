@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This is just an example of build.xml file for test execution on continuous integration servers, including reporting -->
+<project name="functional.tests" default="help">		
+    <property name="out.dir" location="${basedir}/out" />
+    <property name="junit.dir" location="${out.dir}/junit" />
+    <property name="html.dir" location="${out.dir}/html" />
+    <property name="screenshots.dir" location="${out.dir}/screenshots" />
+
+    <target name="init" >
+        <delete dir="${out.dir}" />
+        <mkdir dir="${junit.dir}" />
+	<mkdir dir="${html.dir}" />
+	<mkdir dir="${screenshots.dir}" />
+    </target> 
+	
+    <target name="prepare" >		
+        <echo>PREPARING INFRASTRUCTURE ...</echo>        
+	<!-- Sometimes Hudson cannot see mappings.xml and properties.xml files unless copied to a different directory, this is a workaround -->
+	<copy file="${basedir}/mappings.xml" todir="${basedir}/../../.." overwrite="true"/>
+	<copy file="${basedir}/properties.xml" todir="${basedir}/../../.." overwrite="true"/>				
+    </target>
+
+    <target name="execute_ff" >
+	<echo>EXECUTING TESTS ...</echo>        				
+ 	<exec dir="${basedir}" osfamily="windows" executable="cmd.exe">		
+		<env key="WBROWSER" value="ff"/>
+		<env key="RUBYLIB" path="${basedir}/libs"/>
+		<arg line="/c rake cucumber ./* --format junit --out '${junit.dir}'"/>
+	</exec>
+	<exec dir="${basedir}" osfamily="unix" executable="cucumber">		
+		<env key="WBROWSER" value="ff"/>
+		<env key="RUBYLIB" path="${basedir}/libs"/>
+		<arg line="${basedir}/features --format junit --out '${junit.dir}'"/>
+	</exec>
+	<exec dir="${basedir}" osfamily="mac" executable="cucumber">		
+		<env key="WBROWSER" value="ff"/>
+		<env key="RUBYLIB" path="${basedir}/libs"/>
+		<arg line="${basedir}/features --format junit --out '${junit.dir}'"/>
+	</exec>
+    </target>		
+	
+    <target name="execute_chrome" >
+        <echo>EXECUTING TESTS ...</echo>        				
+ 	<exec dir="${basedir}" osfamily="windows" executable="cmd.exe">		
+		<env key="WBROWSER" value="chrome"/>
+		<env key="RUBYLIB" path="${basedir}/libs"/>
+		<arg line="/c rake cucumber ./* --format junit --out '${junit.dir}'"/>
+	</exec>
+	<exec dir="${basedir}" osfamily="unix" executable="cucumber">		
+		<env key="WBROWSER" value="chrome"/>
+		<env key="RUBYLIB" path="${basedir}/libs"/>
+		<arg line="${basedir}/features --format junit --out '${junit.dir}'"/>
+	</exec>
+	<exec dir="${basedir}" osfamily="mac" executable="cucumber">		
+		<env key="WBROWSER" value="chrome"/>
+		<env key="RUBYLIB" path="${basedir}/libs"/>
+		<arg line="${basedir}/features --format junit --out '${junit.dir}'"/>
+	</exec>
+    </target>		
+
+    <target name="execute_ie" >
+        <echo>EXECUTING TESTS ...</echo>        				
+ 	<exec dir="${basedir}" osfamily="windows" executable="cmd.exe">		
+		<env key="WBROWSER" value="ie"/>
+		<env key="RUBYLIB" path="${basedir}/libs"/>
+		<arg line="/c rake cucumber ./* --format junit --out '${junit.dir}'"/>
+	</exec>
+    </target>		
+
+    <target name="report" >
+        <echo>REPORTING TEST RESULTS ...</echo>       
+        <junitreport todir="${out.dir}">
+            <fileset dir="${junit.dir}">
+                <include name="TEST-*.xml" />
+            </fileset>
+            <report format="noframes" todir="${html.dir}" />
+        </junitreport>
+    </target>
+
+    <target name="ff" depends="init, execute_ff, report" />
+    <target name="chrome" depends="init, execute_chrome, report" />
+    <target name="ie" depends="init, execute_ie, report" />
+
+    <target name="help">
+        <echo message="Possible targets: ff, chrome, ie" />
+    </target>
+
+</project>

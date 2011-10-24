@@ -1,0 +1,9 @@
+<!-- Object mappings -->
+<root>
+<page name="Home page">
+	<obj name="Search field" type="text_field" attr=":xpath" value="//*[@id='lst-ib']"/>
+	<obj name="Search button" type="button" attr=":name" value="btnG"/>
+	<obj name="konnichiwa" type="button" attr=":id" value="fake"/>
+</page>
+</root>
+
