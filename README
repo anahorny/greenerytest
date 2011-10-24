@@ -44,7 +44,7 @@ ENVIRONMENT PROPERTIES
 	 ------------------------properties.xml-----------------------------
 	 <root>
 	 <host name="common">   
-		<site_url>http://localhost:3000</site_url>
+		<site_url>http://localhost:3000/</site_url>
 	 </host>
 	 </root>
 	 ------------------------properties.xml-----------------------------
