@@ -1,7 +1,7 @@
  |_   _        _)_  _  o 
  ) ) (_) )_)_)  (_ (_) o 
 
-How to use the "Dimanche" test automation framework.
+How to use the "Greenerytest" test automation framework.
 
 Important: This test automation framework is based on Watir Webdriver and Cucumber. You should be familiar with these tools and also Ruby programming language to start working with the framework.
 
