@@ -1,4 +1,4 @@
-Greenerytest is open source and freeware test automation framework built upon Watir Webdriver and Cucumber.
+Greenerytest is a keyword-driven test automation framework built upon Watir Webdriver and Cucumber.
 
 The main goal of the framework is to speed-up scripts creation and decrease time for maintenance.
 
